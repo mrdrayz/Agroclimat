@@ -1,0 +1,121 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.header h2 {
+  margin: 0 0 0.35rem;
+}
+
+.lead {
+  margin: 0;
+  max-width: 52rem;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.btn-toggle {
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, var(--green-600), var(--green-800));
+  box-shadow: var(--shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
+}
+
+.btn-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+.empty {
+  color: var(--text-muted);
+  margin-top: 0.75rem;
+}
+
+.alerts-list {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+article {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 0.95rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.85rem;
+  align-items: start;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.location {
+  margin: 0.25rem 0 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+}
+
+.location .sep {
+  opacity: 0.5;
+}
+
+.dash-link {
+  font-weight: 600;
+  color: var(--green-700);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(60, 179, 113, 0.35);
+}
+
+.dash-link:hover {
+  border-bottom-color: var(--green-700);
+}
+
+.body .msg {
+  margin: 0.4rem 0;
+  word-break: break-word;
+}
+
+.meta {
+  color: var(--text-muted);
+}
+
+article:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+
+.buttons {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.buttons button {
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, var(--green-600), var(--green-800));
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.buttons button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

@@ -1,0 +1,80 @@
+<div class="auth-wrap">
+  <div class="panel">
+    <h2>Мониторинг микроклимата</h2>
+    <p>Вход в систему агрокомплекса</p>
+
+    <div class="register-success" *ngIf="registerSuccess() as banner">
+      <div class="register-success__icon" aria-hidden="true">✓</div>
+      <div class="register-success__text">
+        <strong>Регистрация прошла успешно</strong>
+        <p>
+          Аккаунт создан. Вы перенаправлены на <strong>страницу входа</strong> — введите тот же email и пароль в форме
+          ниже.
+        </p>
+        <p class="register-success__hint">Через {{ banner.secondsLeft }} сек. это сообщение скроется автоматически.</p>
+      </div>
+      <button type="button" class="register-success__close" (click)="dismissRegisterSuccess()" aria-label="Закрыть">
+        ×
+      </button>
+    </div>
+
+    <div class="tabs">
+      <button [class.active]="mode() === 'login'" type="button" (click)="switchMode('login')">Вход</button>
+      <button [class.active]="mode() === 'register'" type="button" (click)="switchMode('register')">Регистрация</button>
+    </div>
+
+    <form *ngIf="mode() === 'login'" [formGroup]="loginForm" (ngSubmit)="login()">
+      <label>Email</label>
+      <input type="email" formControlName="email" autocomplete="username" />
+      <small *ngIf="loginForm.controls.email.touched && loginForm.controls.email.invalid">Введите корректный email</small>
+
+      <label>Пароль</label>
+      <input type="password" formControlName="password" autocomplete="current-password" />
+      <small *ngIf="loginForm.controls.password.touched && loginForm.controls.password.invalid">Минимум 6 символов</small>
+
+      <button type="submit" [disabled]="loading()">{{ loading() ? 'Вход…' : 'Войти' }}</button>
+    </form>
+
+    <form *ngIf="mode() === 'register'" [formGroup]="registerForm" (ngSubmit)="register()">
+      <label>ФИО</label>
+      <input type="text" formControlName="fullName" autocomplete="name" />
+      <small *ngIf="registerForm.controls.fullName.touched && registerForm.controls.fullName.hasError('required')"
+        >Укажите ФИО</small
+      >
+      <small *ngIf="registerForm.controls.fullName.touched && registerForm.controls.fullName.hasError('minlength')"
+        >Не короче 3 символов</small
+      >
+      <small *ngIf="registerForm.controls.fullName.touched && registerForm.controls.fullName.hasError('pattern')"
+        >Допустимы буквы (включая ё), цифры, пробел, точка, дефис, апостроф</small
+      >
+
+      <label>Email</label>
+      <input type="email" formControlName="email" autocomplete="email" />
+      <small *ngIf="registerForm.controls.email.touched && registerForm.controls.email.invalid"
+        >Введите корректный email</small
+      >
+
+      <label>Пароль</label>
+      <input type="password" formControlName="password" autocomplete="new-password" />
+      <small *ngIf="registerForm.controls.password.touched && registerForm.controls.password.hasError('required')"
+        >Введите пароль</small
+      >
+      <small *ngIf="registerForm.controls.password.touched && registerForm.controls.password.hasError('minlength')"
+        >Минимум 6 символов</small
+      >
+
+      <label>Повторите пароль</label>
+      <input type="password" formControlName="confirmPassword" autocomplete="new-password" />
+      <small *ngIf="registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.invalid"
+        >Подтвердите пароль</small
+      >
+      <small *ngIf="registerForm.hasError('passwordMismatch') && registerForm.controls.confirmPassword.touched"
+        >Пароли не совпадают</small
+      >
+
+      <button type="submit" [disabled]="loading()">{{ loading() ? 'Отправка…' : 'Зарегистрироваться' }}</button>
+    </form>
+
+    <div class="error" *ngIf="error()">{{ error() }}</div>
+  </div>
+</div>

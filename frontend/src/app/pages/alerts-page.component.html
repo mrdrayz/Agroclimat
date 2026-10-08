@@ -1,0 +1,45 @@
+<section class="header">
+  <div>
+    <h2>Предупреждения микроклимата</h2>
+    <p class="lead">
+      Система создаёт запись, когда показание датчика выходит за порог (правило). Открытое предупреждение требует реакции;
+      «Принять к сведению» фиксирует, что вы увидели тревогу; «Закрыть» завершает её после устранения причины.
+    </p>
+  </div>
+  <button type="button" class="btn-toggle" (click)="toggleOpenOnly()">
+    {{ openOnly() ? 'Показать все' : 'Только открытые' }}
+  </button>
+</section>
+
+<div class="alerts-list">
+  <article *ngFor="let alert of alerts()">
+    <div class="body">
+      <strong>{{ metricRu(alert.metric) }} · {{ severityRu(alert.severity) }}</strong>
+      <p class="location" *ngIf="alert.greenhouseName">
+        <span>Теплица: {{ alert.greenhouseName }}</span>
+        <span class="sep">·</span>
+        <span>Секция: {{ alert.zoneName }}</span>
+        <a
+          class="dash-link"
+          routerLink="/dashboard"
+          [queryParams]="{ greenhouseId: alert.greenhouseId, zoneId: alert.zoneId }"
+          >Открыть на обзоре</a
+        >
+      </p>
+      <p class="msg">{{ alert.message }}</p>
+      <small class="meta">
+        Текущее значение: {{ alert.lastValue }} {{ alert.unit }} · Состояние: {{ statusRu(alert.status) }}
+        <span *ngIf="alert.endedAt"> · Время: {{ alert.endedAt | date: 'short' }}</span>
+      </small>
+    </div>
+    <div class="buttons">
+      <button type="button" (click)="ack(alert.id)" [disabled]="alert.status !== 'OPEN'">
+        Принять к сведению
+      </button>
+      <button type="button" (click)="close(alert.id)" [disabled]="alert.status === 'CLOSED'">Закрыть</button>
+    </div>
+  </article>
+</div>
+
+<p class="empty" *ngIf="!alerts().length && !openOnly()">Нет записей.</p>
+<p class="empty" *ngIf="!alerts().length && openOnly()">Нет открытых предупреждений.</p>

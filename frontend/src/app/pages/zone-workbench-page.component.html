@@ -1,0 +1,204 @@
+<h2>Управление теплицами и секциями</h2>
+<p class="msg">{{ message() }}</p>
+<p class="scope-hint" *ngIf="auth.hasAnyRole(['AGRONOMIST']) && auth.greenhouseAccess().scoped && !auth.canUseWorkbenchEdits()">
+  Вам назначены только теплицы с уровнем «Просмотр» — создание и изменение секций, датчиков и порогов недоступны.
+</p>
+
+<div class="grid">
+  <section *ngIf="auth.canCreateGreenhouse()">
+    <h3>Новая теплица</h3>
+    <form [formGroup]="greenhouseForm" (ngSubmit)="createGreenhouse()">
+      <input placeholder="Название" formControlName="name" />
+      <input placeholder="Локация" formControlName="location" />
+      <button type="submit">Добавить</button>
+    </form>
+  </section>
+
+  <section *ngIf="auth.canUseWorkbenchEdits()">
+    <h3>Новая секция</h3>
+    <form [formGroup]="zoneForm" (ngSubmit)="createZone()">
+      <select formControlName="greenhouseId">
+        <option [value]="0">Выберите теплицу</option>
+        <option *ngFor="let gh of greenhouses()" [value]="gh.id">{{ gh.name }}</option>
+      </select>
+      <input placeholder="Название секции" formControlName="name" />
+      <input placeholder="Описание" formControlName="description" />
+      <input type="number" min="0.5" step="0.01" placeholder="Площадь м²" formControlName="areaM2" />
+      <button type="submit">Добавить</button>
+    </form>
+  </section>
+
+  <section *ngIf="auth.canUseWorkbenchEdits()">
+    <h3>Новый датчик</h3>
+    <form [formGroup]="sensorForm" (ngSubmit)="createSensor()">
+      <select formControlName="zoneId">
+        <option [value]="0">Выберите секцию</option>
+        <option *ngFor="let zone of zones()" [value]="zone.id">{{ zone.name }}</option>
+      </select>
+      <select formControlName="metric">
+        <option *ngFor="let metric of metrics" [value]="metric">{{ metric }}</option>
+      </select>
+      <input placeholder="Имя датчика" formControlName="name" />
+      <select formControlName="status">
+        <option value="ACTIVE">ACTIVE</option>
+        <option value="INACTIVE">INACTIVE</option>
+      </select>
+      <button type="submit">Добавить</button>
+    </form>
+  </section>
+
+  <section *ngIf="auth.canUseWorkbenchEdits()">
+    <h3>Новое пороговое правило</h3>
+    <form [formGroup]="ruleForm" (ngSubmit)="createRule()">
+      <label>
+        <span class="field-label">Секция</span>
+        <select formControlName="zoneId">
+          <option [value]="0">Выберите секцию</option>
+          <option *ngFor="let zone of zones()" [value]="zone.id">{{ zone.name }}</option>
+        </select>
+      </label>
+      <label>
+        <span class="field-label">Метрика</span>
+        <select formControlName="metric">
+          <option *ngFor="let metric of metrics" [value]="metric">{{ metricRu(metric) }}</option>
+        </select>
+      </label>
+      <label>
+        <span class="field-label">Минимум (нижняя граница)</span>
+        <input type="number" step="0.01" formControlName="minValue" />
+      </label>
+      <label>
+        <span class="field-label">Максимум (верхняя граница)</span>
+        <input type="number" step="0.01" formControlName="maxValue" />
+      </label>
+      <label class="chk"><input type="checkbox" formControlName="enabled" /> Правило включено</label>
+      <label>
+        <span class="field-label">Важность при срабатывании</span>
+        <select formControlName="severity">
+          <option *ngFor="let severity of severities" [value]="severity">{{ severityRu(severity) }}</option>
+        </select>
+      </label>
+      <button type="submit">Добавить</button>
+    </form>
+  </section>
+</div>
+
+<section class="catalog">
+  <h3>Теплицы — редактирование</h3>
+  <div class="row" *ngFor="let g of greenhouses()">
+    <div class="row-inner" *ngIf="editingGhId() !== g.id">
+      <div class="meta"><strong>{{ g.name }}</strong> · {{ g.location }}</div>
+      <button type="button" class="btn-sec" *ngIf="auth.canManageGreenhouse(g.id)" (click)="beginEditGreenhouse(g)">
+        Изменить
+      </button>
+    </div>
+    <form
+      *ngIf="editingGhId() === g.id"
+      class="inline-form"
+      [formGroup]="greenhouseEditForm"
+      (ngSubmit)="submitGreenhouseEdit()"
+    >
+      <input formControlName="name" />
+      <input formControlName="location" />
+      <button type="submit">Сохранить</button>
+      <button type="button" class="btn-sec" (click)="cancelAllEdits()">Отмена</button>
+    </form>
+  </div>
+</section>
+
+<section class="catalog">
+  <h3>Секции — редактирование</h3>
+  <div class="row" *ngFor="let z of zones()">
+    <div class="row-inner" *ngIf="editingZoneId() !== z.id">
+      <div class="meta">
+        <strong>{{ z.name }}</strong> · {{ greenhouseName(z.greenhouseId) }} · {{ z.areaM2 }} м²
+        <span class="hint" *ngIf="z.description">— {{ z.description }}</span>
+      </div>
+      <button type="button" class="btn-sec" *ngIf="auth.canManageGreenhouse(z.greenhouseId)" (click)="beginEditZone(z)">
+        Изменить
+      </button>
+    </div>
+    <form *ngIf="editingZoneId() === z.id" class="inline-form grid-form" [formGroup]="zoneEditForm" (ngSubmit)="submitZoneEdit()">
+      <select formControlName="greenhouseId">
+        <option *ngFor="let gh of greenhouses()" [value]="gh.id">{{ gh.name }}</option>
+      </select>
+      <input formControlName="name" />
+      <input formControlName="description" />
+      <input type="number" step="0.01" formControlName="areaM2" />
+      <button type="submit">Сохранить</button>
+      <button type="button" class="btn-sec" (click)="cancelAllEdits()">Отмена</button>
+    </form>
+  </div>
+</section>
+
+<section class="catalog">
+  <h3>Датчики — редактирование</h3>
+  <div class="row" *ngFor="let s of sensors()">
+    <div class="row-inner" *ngIf="editingSensorId() !== s.id">
+      <div class="meta">
+        <strong>{{ s.name }}</strong> · {{ zoneName(s.zoneId) }} · {{ s.metric }} · {{ s.status }}
+      </div>
+      <button type="button" class="btn-sec" *ngIf="canManageZone(s.zoneId)" (click)="beginEditSensor(s)">Изменить</button>
+    </div>
+    <form *ngIf="editingSensorId() === s.id" class="inline-form grid-form" [formGroup]="sensorEditForm" (ngSubmit)="submitSensorEdit()">
+      <select formControlName="zoneId">
+        <option *ngFor="let z of zones()" [value]="z.id">{{ z.name }}</option>
+      </select>
+      <select formControlName="metric">
+        <option *ngFor="let m of metrics" [value]="m">{{ m }}</option>
+      </select>
+      <input formControlName="name" />
+      <select formControlName="status">
+        <option value="ACTIVE">ACTIVE</option>
+        <option value="INACTIVE">INACTIVE</option>
+      </select>
+      <button type="submit">Сохранить</button>
+      <button type="button" class="btn-sec" (click)="cancelAllEdits()">Отмена</button>
+    </form>
+  </div>
+</section>
+
+<section class="catalog">
+  <h3>Пороговые правила — редактирование</h3>
+  <div class="row" *ngFor="let r of rules()">
+    <div class="row-inner" *ngIf="editingRuleId() !== r.id">
+      <div class="meta">
+        <strong>Правило №{{ r.id }}</strong> · секция «{{ zoneName(r.zoneId) }}» · {{ metricRu(r.metric) }} · диапазон
+        {{ r.minValue }}…{{ r.maxValue }} {{ r.unit }} · важность: {{ severityRu(r.severity) }} ·
+        <span [class.off]="!r.enabled">{{ r.enabled ? 'включено' : 'выключено' }}</span>
+      </div>
+      <button type="button" class="btn-sec" *ngIf="canManageZone(r.zoneId)" (click)="beginEditRule(r)">Изменить</button>
+    </div>
+    <form *ngIf="editingRuleId() === r.id" class="inline-form grid-form rule-edit-form" [formGroup]="ruleEditForm" (ngSubmit)="submitRuleEdit()">
+      <label>
+        <span class="field-label">Секция</span>
+        <select formControlName="zoneId">
+          <option *ngFor="let z of zones()" [value]="z.id">{{ z.name }}</option>
+        </select>
+      </label>
+      <label>
+        <span class="field-label">Метрика</span>
+        <select formControlName="metric">
+          <option *ngFor="let m of metrics" [value]="m">{{ metricRu(m) }}</option>
+        </select>
+      </label>
+      <label>
+        <span class="field-label">Минимум (нижняя граница)</span>
+        <input type="number" step="0.01" formControlName="minValue" />
+      </label>
+      <label>
+        <span class="field-label">Максимум (верхняя граница)</span>
+        <input type="number" step="0.01" formControlName="maxValue" />
+      </label>
+      <label class="chk"><input type="checkbox" formControlName="enabled" /> Правило включено</label>
+      <label>
+        <span class="field-label">Важность при срабатывании</span>
+        <select formControlName="severity">
+          <option *ngFor="let sev of severities" [value]="sev">{{ severityRu(sev) }}</option>
+        </select>
+      </label>
+      <button type="submit">Сохранить</button>
+      <button type="button" class="btn-sec" (click)="cancelAllEdits()">Отмена</button>
+    </form>
+  </div>
+</section>

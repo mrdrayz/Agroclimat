@@ -1,0 +1,70 @@
+<h2>Журнал наблюдений</h2>
+<p class="intro">Выберите теплицу и секцию из списка, затем опишите наблюдение. Текст проверяется на длину и допустимые символы.</p>
+
+<section class="panel toolbar" *ngIf="reports().length > 0">
+  <span class="toolbar-label">Экспорт всех записей:</span>
+  <button type="button" class="btn-secondary" (click)="exportXlsx()">Скачать Excel (.xlsx)</button>
+  <button type="button" class="btn-secondary" (click)="exportPdf()">Скачать PDF</button>
+</section>
+
+<section class="panel">
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <label>Теплица</label>
+    <select formControlName="greenhouseId">
+      <option [ngValue]="null">— выберите теплицу —</option>
+      <option *ngFor="let g of greenhouses()" [ngValue]="g.id">{{ g.name }} ({{ g.location }})</option>
+    </select>
+
+    <label>Секция</label>
+    <select formControlName="zoneId">
+      <option [ngValue]="null">— сначала выберите теплицу —</option>
+      <option *ngFor="let z of zones()" [ngValue]="z.id">{{ z.name }}</option>
+    </select>
+
+    <label>Наблюдение <span class="counter">({{ (form.get('details')?.value?.length ?? 0) }} / {{ detailsMax }})</span></label>
+    <textarea
+      rows="4"
+      placeholder="Подробности наблюдения"
+      formControlName="details"
+      [attr.maxlength]="detailsMax"
+    ></textarea>
+    <small *ngIf="form.get('details')?.touched && form.get('details')?.invalid">От 3 до {{ detailsMax }} символов, допустимые знаки — буквы, цифры, базовая пунктуация.</small>
+    <button type="submit">Добавить запись</button>
+  </form>
+</section>
+
+<section class="panel list">
+  <p *ngIf="reports().length === 0" class="empty">Пока нет записей. Добавьте первое наблюдение выше.</p>
+
+  <article class="obs-card" *ngFor="let report of reports()">
+    <div class="obs-card__head">
+      <strong>{{ report.greenhouse }} / {{ report.zone }}</strong>
+      <div class="obs-card__actions" *ngIf="editingId() !== report.id">
+        <button type="button" class="btn-ghost" (click)="startEdit(report)">Изменить</button>
+        <button type="button" class="btn-danger" (click)="deleteReport(report.id)">Удалить</button>
+      </div>
+    </div>
+
+    <ng-container *ngIf="editingId() === report.id; else viewBlock">
+      <label class="edit-label">Текст наблюдения</label>
+      <textarea
+        class="edit-area"
+        rows="4"
+        [attr.maxlength]="detailsMax"
+        [ngModel]="editDetails()"
+        (ngModelChange)="onEditDetailsChange($event)"
+      ></textarea>
+      <small class="edit-counter">{{ editDetails().length }} / {{ detailsMax }}</small>
+      <small class="edit-error" *ngIf="editValidationError()">{{ editValidationError() }}</small>
+      <div class="edit-actions">
+        <button type="button" (click)="saveEdit(report.id)">Сохранить</button>
+        <button type="button" class="btn-secondary" (click)="cancelEdit()">Отмена</button>
+      </div>
+    </ng-container>
+    <ng-template #viewBlock>
+      <p class="obs-text">{{ report.details }}</p>
+    </ng-template>
+
+    <small class="obs-meta">{{ report.author }} | {{ report.createdAt | date: 'short' }}</small>
+  </article>
+</section>

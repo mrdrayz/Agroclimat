@@ -1,0 +1,43 @@
+spring:
+    application:
+        name: agroclimate-monitoring
+
+    datasource:
+        url: jdbc:postgresql://localhost:5432/agro_db
+        driver-class-name: org.postgresql.Driver
+        username: postgres
+        password: qwerty
+
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: false
+        properties:
+            hibernate:
+                format_sql: true
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+    port: 8080
+
+# Swagger / OpenAPI
+springdoc:
+    api-docs:
+        path: /v3/api-docs
+    swagger-ui:
+        path: /swagger-ui.html
+        operationsSorter: method
+        tagsSorter: alpha
+
+app:
+    security:
+        jwt:
+            # 32+ байтный секрет (Base64 не обязателен).
+            secret: "fpvqZ6oq5eDn1euhU46TkZhyIxlMSkgbkBjFv+MPlGs="
+            # Время жизни access-токена (в миллисекундах). 24 часа.
+            expiration-ms: 86400000
+
+    simulation:
+        enabled: true
+        # Период генерации новых измерений в миллисекундах.
+        period-ms: 5000

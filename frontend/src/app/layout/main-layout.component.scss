@@ -1,0 +1,123 @@
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 288px 1fr;
+  background: transparent;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--green-900) 0%, var(--green-950) 100%);
+  color: #f4fff8;
+  padding: 1.35rem 1.1rem;
+  gap: 1rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 8px 0 32px rgba(11, 31, 20, 0.18);
+}
+
+.brand-block {
+  flex: 0 0 auto;
+}
+
+.nav-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+  align-content: flex-start;
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  letter-spacing: -0.03em;
+}
+
+.user {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.roles {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(232, 247, 238, 0.75);
+  line-height: 1.35;
+}
+
+a {
+  display: block;
+  flex: 0 0 auto;
+  color: #f4fff8;
+  text-decoration: none;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateX(2px);
+}
+
+a.active {
+  background: rgba(60, 179, 113, 0.22);
+  border-color: rgba(92, 204, 136, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.logout {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--green-950);
+  background: #f4fff8;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.logout:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.content {
+  padding: 1.25rem clamp(0.75rem, 2vw, 1.75rem);
+  overflow-x: hidden;
+}
+
+@media (max-width: 980px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    flex-direction: column;
+    align-items: stretch;
+    max-height: none;
+  }
+  .nav-block {
+    display: grid;
+    grid-template-columns: 1fr;
+    overflow: visible;
+    width: auto;
+  }
+  .logout {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+}

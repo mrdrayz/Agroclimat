@@ -1,0 +1,42 @@
+<h2>Администрирование пользователей</h2>
+<p class="msg">{{ message() }}</p>
+
+<section class="panel">
+  <h3>Создать пользователя</h3>
+  <form [formGroup]="createForm" (ngSubmit)="registerUserByAdmin()">
+    <input placeholder="ФИО" formControlName="fullName" />
+    <input placeholder="Email" formControlName="email" />
+    <input type="password" placeholder="Пароль" formControlName="password" />
+    <label>Роль:</label>
+    <select multiple formControlName="roles">
+      <option *ngFor="let role of allRoles" [value]="role">{{ roleRu(role) }}</option>
+    </select>
+    <button type="submit">Создать</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h3>Список пользователей</h3>
+  <p *ngIf="loading()">Загрузка...</p>
+  <div class="table">
+    <article *ngFor="let user of users()">
+      <div>
+        <strong>{{ user.fullName }}</strong>
+        <p>{{ user.email }} · {{ statusRu(user.status) }}</p>
+        <p class="role-line">Роли: {{ formatUserRoles(user) }}</p>
+      </div>
+      <div class="actions">
+        <button type="button" (click)="toggleStatus(user)">
+          {{ user.status === 'ACTIVE' ? 'Заблокировать' : 'Разблокировать' }}
+        </button>
+        <label class="mini-label">Изменить роли</label>
+        <select multiple [id]="'roles-' + user.id" class="role-select">
+          <option *ngFor="let role of allRoles" [value]="role" [selected]="user.roles.includes(role)">
+            {{ roleRu(role) }}
+          </option>
+        </select>
+        <button type="button" class="secondary" (click)="saveRoles(user)">Сохранить роли</button>
+      </div>
+    </article>
+  </div>
+</section>

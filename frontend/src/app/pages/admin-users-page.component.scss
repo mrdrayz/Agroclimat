@@ -1,0 +1,88 @@
+.msg {
+  color: var(--green-800);
+  font-weight: 600;
+}
+
+.panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin-bottom: 0.85rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.55rem;
+}
+
+input,
+select,
+button {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  padding: 0.55rem;
+  font-family: inherit;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--green-500);
+  box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.2);
+}
+
+button {
+  background: linear-gradient(135deg, var(--green-600), var(--green-800));
+  color: #fff;
+  border: 0;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+.table article {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.actions {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.mini-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.role-select {
+  min-height: 5.5rem;
+}
+
+.role-line {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+button.secondary {
+  background: var(--surface-2);
+  color: var(--green-900);
+  border: 1px solid var(--border);
+}
+
+button.secondary:hover {
+  box-shadow: var(--shadow);
+}

@@ -1,0 +1,43 @@
+<h2>Назначения на теплицы</h2>
+<p class="lead">
+  Таблица: кто с каким уровнем видит теплицу. Просмотр — только чтение; Управление — секции, датчики и пороги для этой теплицы.
+</p>
+<p class="msg">{{ message() }}</p>
+
+<section class="panel">
+  <h3>Добавить или обновить назначение</h3>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <label>Пользователь</label>
+    <select formControlName="userId">
+      <option [ngValue]="null">— выберите —</option>
+      <option *ngFor="let u of users()" [ngValue]="u.id">{{ u.fullName }} ({{ u.email }})</option>
+    </select>
+    <label>Теплица</label>
+    <select formControlName="greenhouseId">
+      <option [ngValue]="null">— выберите —</option>
+      <option *ngFor="let g of greenhouses()" [ngValue]="g.id">{{ g.name }}</option>
+    </select>
+    <label>Уровень</label>
+    <select formControlName="accessLevel">
+      <option value="VIEW">Просмотр</option>
+      <option value="MANAGE">Управление</option>
+    </select>
+    <button type="submit">Сохранить назначение</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h3>Текущие назначения</h3>
+  <p *ngIf="loading()">Загрузка…</p>
+  <p *ngIf="!loading() && !assignments().length" class="muted">Пока нет записей — доступ ко всем теплицам определяется только ролями.</p>
+  <div class="table" *ngIf="assignments().length">
+    <article *ngFor="let a of assignments()">
+      <div>
+        <strong>{{ a.userEmail }}</strong>
+        <p class="muted">{{ a.greenhouseName }}</p>
+        <p>Уровень: {{ accessRu(a.accessLevel) }} · с {{ formatDate(a.assignedAt) }}</p>
+      </div>
+      <button type="button" class="secondary" (click)="remove(a)">Удалить</button>
+    </article>
+  </div>
+</section>

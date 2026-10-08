@@ -1,0 +1,113 @@
+<section class="page-head">
+  <div>
+    <h2>Обзор теплиц</h2>
+  </div>
+  <div class="head-actions">
+    <span class="live">
+      <span class="pulse"></span>
+      Онлайн
+    </span>
+    <button type="button" class="btn-primary" (click)="reload()">Обновить список</button>
+  </div>
+</section>
+
+<p class="loading" *ngIf="loading()">Загрузка...</p>
+
+<div class="greenhouse-grid">
+  <article
+    class="gh-card"
+    *ngFor="let greenhouse of greenhouses()"
+    [class.selected]="selectedGreenhouseId() === greenhouse.id"
+    (click)="selectGreenhouse(greenhouse.id)"
+    (keyup.enter)="selectGreenhouse(greenhouse.id)"
+    tabindex="0"
+    role="button"
+  >
+    <div class="gh-card-top">
+      <h3>{{ greenhouse.name }}</h3>
+      <span class="pill">Число секций: {{ greenhouseZones(greenhouse.id).length }}</span>
+    </div>
+    <p class="location">{{ greenhouse.location }}</p>
+  </article>
+</div>
+
+<ng-container *ngIf="selectedGreenhouseId() as greenhouseId">
+  <section class="split">
+    <div class="col">
+      <h3 class="section-title">Секции (текстовый выбор)</h3>
+      <div class="zone-list">
+        <article
+          class="zone-card"
+          *ngFor="let zone of greenhouseZones(greenhouseId)"
+          [class.selected]="selectedZoneId() === zone.id"
+          (click)="selectZone(zone.id)"
+          (keyup.enter)="selectZone(zone.id)"
+          tabindex="0"
+          role="button"
+        >
+          <div class="zone-card-head">
+            <h4>{{ zone.name }}</h4>
+            <span class="badge">Предупреждений: {{ activeAlertsForZone(zone.id) }}</span>
+          </div>
+          <p class="desc">{{ zone.description || 'Описание не указано' }}</p>
+          <div class="meta">
+            <span>Площадь: {{ zone.areaM2 }} м²</span>
+            <span>Датчиков: {{ zoneSensors(zone.id).length }}</span>
+          </div>
+          <div class="readings" *ngIf="zoneSensors(zone.id).length">
+            <div class="reading" *ngFor="let sensor of zoneSensors(zone.id)">
+              <span class="r-label">{{ metricShort(sensor.metric) }}</span>
+              <span class="r-value"
+                >{{ formatValue(sensor.id) }} <small>{{ displayUnit(sensor.id, sensor.unit) }}</small></span
+              >
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="col">
+      <h3 class="section-title">Схема теплицы</h3>
+      <div class="plan-wrap">
+        <div class="plan-label">Нажмите на секцию на схеме или в списке слева</div>
+        <div class="plan-frame" [style.grid-template-columns]="zoneGridColumns(greenhouseId)">
+          <button
+            type="button"
+            class="zone-tile"
+            *ngFor="let zone of greenhouseZones(greenhouseId)"
+            [class.selected]="selectedZoneId() === zone.id"
+            (click)="selectZone(zone.id)"
+          >
+            <span class="tile-title">{{ zone.name }}</span>
+            <div class="tile-readings" *ngIf="zoneSensors(zone.id).length">
+              <span *ngFor="let sensor of zoneSensors(zone.id)">
+                {{ metricShort(sensor.metric) }}:
+                <strong>{{ formatValue(sensor.id) }}</strong>
+                {{ displayUnit(sensor.id, sensor.unit) }}
+              </span>
+            </div>
+            <span class="tile-hint" *ngIf="!zoneSensors(zone.id).length">Нет датчиков</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-container>
+
+<section class="sensor-panel" *ngIf="selectedZoneId() as zoneId">
+  <h3>Показания датчиков: выбранная секция</h3>
+  <div class="sensor-grid">
+    <article class="sensor-card" *ngFor="let sensor of zoneSensors(zoneId)">
+      <div class="sensor-card-head">
+        <strong>{{ sensor.name }}</strong>
+        <span class="status" [class.on]="sensor.status === 'ACTIVE'">{{ sensor.status }}</span>
+      </div>
+      <p class="metric-line">{{ sensor.metric }} · {{ sensor.unit }}</p>
+      <div class="big-value">
+        {{ formatValue(sensor.id) }}
+        <span class="unit">{{ displayUnit(sensor.id, sensor.unit) }}</span>
+      </div>
+      <p class="hint" *ngIf="!latestBySensor()[sensor.id]">Ожидание первого измерения…</p>
+    </article>
+  </div>
+</section>

@@ -1,0 +1,23 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand-block">
+      <h1>AgroClimate</h1>
+      <p class="user">{{ userName() }}</p>
+      <p class="roles">{{ rolesRu() }}</p>
+    </div>
+    <nav class="nav-block">
+      <a routerLink="/dashboard" routerLinkActive="active">Обзор теплиц</a>
+      <a *ngIf="canWarnings()" routerLink="/warnings" routerLinkActive="active">Предупреждение</a>
+      <a *ngIf="canWorkbench()" routerLink="/zone-workbench" routerLinkActive="active">Управление секциями</a>
+      <a routerLink="/reports" routerLinkActive="active">Журнал наблюдений</a>
+      <a *ngIf="canManageUsers()" routerLink="/admin/users" routerLinkActive="active">Пользователи и роли</a>
+      <a *ngIf="canManageUsers()" routerLink="/admin/greenhouse-assignments" routerLinkActive="active"
+        >Назначения на теплицы</a
+      >
+    </nav>
+    <button type="button" class="logout" (click)="logout()">Выйти</button>
+  </aside>
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>
